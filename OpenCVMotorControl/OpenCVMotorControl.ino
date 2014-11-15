@@ -26,7 +26,7 @@ void loop()
       
 
     while(1){
-    setMotor(50, true);
+    setMotor(255, true);
    // delay(1000);
     //setMotor(100,0);
     
