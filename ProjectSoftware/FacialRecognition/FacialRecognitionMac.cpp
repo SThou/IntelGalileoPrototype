@@ -17,7 +17,7 @@
  *
  *  Enhanced by Harish Kothandapani and Sovisit Thou
  *  This file is implemented based on MacOS pathway
- *  
+ *  Revision Date: 11/17/2014 7:06 PM
  */
 
 #define cascade_path "/opt/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml"
@@ -57,7 +57,7 @@ static void read_csv(const string& filename, vector<Mat>& images, vector<int>& l
 }
 
 int main() {
- 
+    
     // Get the path to CSV file:
     string fn_haar = string(cascade_path);
     string fn_csv = string(csv_path);
@@ -67,29 +67,39 @@ int main() {
     // These vectors hold the images and corresponding labels:
     vector<Mat> images;
     vector<int> labels;
-    
+    vector<Mat> equimages;
     // Read in the data (fails if no valid input filename is given, but you'll get an error message):
     
     try {
         read_csv(fn_csv, images, labels);
+        
     } catch (cv::Exception& e) {
         cerr << "Error opening file \"" << fn_csv << "\". Reason: " << e.msg << endl;
         // nothing more we can do
         exit(1);
     }
     
+    equimages.resize(images.size());
+    // perform a histogram
+    for(int i = 0; i < images.size(); i++) {
+        
+        equalizeHist(images[i], equimages[i]);
+    }
     
     // Get the height from the first image. We'll need this
     // later in code to reshape the images to their original
     // size AND we need to reshape incoming faces to this size:
-    int im_width = images[0].cols;
-    int im_height = images[0].rows;
+    int im_width = equimages[0].cols;
+    int im_height = equimages[0].rows;
     
     // Create a FaceRecognizer and train it on the given images:
-    Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-    model->train(images, labels);
+    Ptr<FaceRecognizer> model = createEigenFaceRecognizer();
     
-
+    model->train(equimages, labels);
+    
+    
+    
+    
     CascadeClassifier haar_cascade;
     haar_cascade.load(fn_haar);
     
@@ -114,9 +124,14 @@ int main() {
         Mat gray;
         cvtColor(original, gray, CV_BGR2GRAY);
         
+        
+        
+        Size minFeatureSize(20,20);
+        float searchScaleFactor = 1.1f;
+        
         // Find the faces in the frame:
         vector< Rect_<int> > faces;
-        haar_cascade.detectMultiScale(gray, faces);
+        haar_cascade.detectMultiScale(gray, faces, searchScaleFactor, 4, CASCADE_SCALE_IMAGE, minFeatureSize);
         
         // At this point you have the position of the faces in
         // faces. Now we'll get the faces, make a prediction and
