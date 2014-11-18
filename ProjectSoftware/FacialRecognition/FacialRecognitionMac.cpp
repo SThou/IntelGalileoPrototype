@@ -17,12 +17,12 @@
  *
  *  Enhanced by Harish Kothandapani and Sovisit Thou
  *  This file is implemented based on MacOS pathway
- *  Revision Date: 11/17/2014 7:06 PM
+ *  Revision Date: 11/17/2014 9:22 PM
  */
 
 #define cascade_path "/opt/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml"
-#define csv_path "/Users/ST/Documents/XcodeWorkspace/OpenCV/data_csv.csv"
-#define device_id "1" // 1 for second available camera 0 for default camera
+#define csv_path "/Users/ST/Documents/XcodeWorkspace/OpenCV/Picture_Source/data_csv.csv"
+#define device_id "0" // 1 for second available camera 0 for default camera
 
 #include <opencv2/opencv.hpp>
 #include "opencv2/core/core.hpp"
@@ -98,8 +98,6 @@ int main() {
     model->train(equimages, labels);
     
     
-    
-    
     CascadeClassifier haar_cascade;
     haar_cascade.load(fn_haar);
     
@@ -126,7 +124,7 @@ int main() {
         
         
         
-        Size minFeatureSize(20,20);
+        Size minFeatureSize(80,80);
         float searchScaleFactor = 1.1f;
         
         // Find the faces in the frame:
